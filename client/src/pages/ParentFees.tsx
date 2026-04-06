@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || `${API_URL}`;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 
 interface FeeRecord {
@@ -19,7 +19,6 @@ const ParentFees: React.FC = () => {
     const [fees, setFees] = useState<FeeRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     useEffect(() => {
         const fetchFees = async () => {
