@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || `${API_URL}`;
+
+
 interface StudentProfile {
     name: string;
     class: {
@@ -19,7 +22,7 @@ const StudentPortal: React.FC = () => {
     useEffect(() => {
         const fetchOverview = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/student/overview', {
+                const res = await axios.get(`${API_URL}/api/student/overview`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setData(res.data);

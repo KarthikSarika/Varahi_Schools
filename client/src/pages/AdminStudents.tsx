@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || `${API_URL}`;
+
+
 interface Student {
     id: string;
     name: string;
@@ -36,8 +39,8 @@ const AdminStudents: React.FC = () => {
     const fetchData = async () => {
         try {
             const [studentsRes, classesRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/admin/students', { headers: { Authorization: `Bearer ${token}` } }),
-                axios.get('http://localhost:5000/api/admin/classes', { headers: { Authorization: `Bearer ${token}` } })
+                axios.get(`${API_URL}/api/admin/students`, { headers: { Authorization: `Bearer ${token}` } }),
+                axios.get(`${API_URL}/api/admin/classes`, { headers: { Authorization: `Bearer ${token}` } })
             ]);
             setStudents(studentsRes.data);
             setClasses(classesRes.data);
@@ -74,12 +77,12 @@ const AdminStudents: React.FC = () => {
         e.preventDefault();
         try {
             if (editingId) {
-                await axios.put(`http://localhost:5000/api/admin/students/${editingId}`,
+                await axios.put(`${API_URL}/api/admin/students/${editingId}`,
                     { name, email, password, classId },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             } else {
-                await axios.post('http://localhost:5000/api/admin/students',
+                await axios.post(`${API_URL}/api/admin/students`,
                     { name, email, password, classId },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -94,7 +97,7 @@ const AdminStudents: React.FC = () => {
     const handleDelete = async (id: string) => {
         if (!window.confirm('Are you sure you want to delete this student?')) return;
         try {
-            await axios.delete(`http://localhost:5000/api/admin/students/${id}`, {
+            await axios.delete(`${API_URL}/api/admin/students/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchData();

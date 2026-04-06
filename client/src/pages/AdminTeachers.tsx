@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || `${API_URL}`;
+
+
 interface Teacher {
     id: string;
     name: string;
@@ -22,7 +25,7 @@ const AdminTeachers: React.FC = () => {
 
     const fetchTeachers = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/admin/teachers', {
+            const response = await axios.get(`${API_URL}/api/admin/teachers`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTeachers(response.data);
@@ -57,12 +60,12 @@ const AdminTeachers: React.FC = () => {
         e.preventDefault();
         try {
             if (editingId) {
-                await axios.put(`http://localhost:5000/api/admin/teachers/${editingId}`,
+                await axios.put(`${API_URL}/api/admin/teachers/${editingId}`,
                     { name, email, password },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             } else {
-                await axios.post('http://localhost:5000/api/admin/teachers',
+                await axios.post(`${API_URL}/api/admin/teachers`,
                     { name, email, password },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -77,7 +80,7 @@ const AdminTeachers: React.FC = () => {
     const handleDelete = async (id: string) => {
         if (!window.confirm('Are you sure you want to delete this teacher?')) return;
         try {
-            await axios.delete(`http://localhost:5000/api/admin/teachers/${id}`, {
+            await axios.delete(`${API_URL}/api/admin/teachers/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchTeachers();

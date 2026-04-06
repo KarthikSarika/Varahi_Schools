@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || `${API_URL}`;
+
+
 interface Class {
     id: string;
     name: string;
@@ -22,7 +25,7 @@ const AdminClasses: React.FC = () => {
 
     const fetchClasses = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/admin/classes', {
+            const response = await axios.get(`${API_URL}/api/admin/classes`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(response.data);
@@ -55,12 +58,12 @@ const AdminClasses: React.FC = () => {
         e.preventDefault();
         try {
             if (editingId) {
-                await axios.put(`http://localhost:5000/api/admin/classes/${editingId}`,
+                await axios.put(`${API_URL}/api/admin/classes/${editingId}`,
                     { name, section },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             } else {
-                await axios.post('http://localhost:5000/api/admin/classes',
+                await axios.post(`${API_URL}/api/admin/classes`,
                     { name, section },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -75,7 +78,7 @@ const AdminClasses: React.FC = () => {
     const handleDelete = async (id: string) => {
         if (!window.confirm('Are you sure you want to delete this class?')) return;
         try {
-            await axios.delete(`http://localhost:5000/api/admin/classes/${id}`, {
+            await axios.delete(`${API_URL}/api/admin/classes/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchClasses();

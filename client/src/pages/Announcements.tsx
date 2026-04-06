@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || `${API_URL}`;
+
+
 interface Announcement {
     id: string;
     title: string;
@@ -24,7 +27,7 @@ const Announcements: React.FC = () => {
 
     const fetchAnnouncements = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/admin/announcements', {
+            const res = await axios.get(`${API_URL}/api/admin/announcements`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAnnouncements(res.data);
@@ -42,7 +45,7 @@ const Announcements: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/admin/announcements',
+            await axios.post(`${API_URL}/api/admin/announcements`,
                 { title, content },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

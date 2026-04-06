@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || `${API_URL}`;
+
+
 interface Class {
     id: string;
     name: string;
@@ -31,7 +34,7 @@ const TeacherMarks: React.FC = () => {
     useEffect(() => {
         const fetchClasses = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/teacher/classes', {
+                const res = await axios.get(`${API_URL}/api/teacher/classes`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setClasses(res.data);
@@ -51,7 +54,7 @@ const TeacherMarks: React.FC = () => {
         if (selectedClass) {
             const fetchStudents = async () => {
                 try {
-                    const res = await axios.get(`http://localhost:5000/api/teacher/classes/${selectedClass}/students`, {
+                    const res = await axios.get(`${API_URL}/api/teacher/classes/${selectedClass}/students`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setStudents(res.data);
@@ -78,7 +81,7 @@ const TeacherMarks: React.FC = () => {
         }));
 
         try {
-            await axios.post('http://localhost:5000/api/teacher/marks', {
+            await axios.post(`${API_URL}/api/teacher/marks`, {
                 subjectId: selectedSubject,
                 type: examType,
                 marksData

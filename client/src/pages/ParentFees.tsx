@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || `${API_URL}`;
+
+
 interface FeeRecord {
     id: string;
     status: string;
@@ -22,12 +25,12 @@ const ParentFees: React.FC = () => {
         const fetchFees = async () => {
             try {
                 // High level assumption: fetch fees for the first child from profile
-                const overviewRes = await axios.get('http://localhost:5000/api/student/overview', {
+                const overviewRes = await axios.get(`${API_URL}/api/student/overview`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const studentId = overviewRes.data.profile.id;
 
-                const res = await axios.get(`http://localhost:5000/api/student/${studentId}/fees`, {
+                const res = await axios.get(`${API_URL}/api/student/${studentId}/fees`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setFees(res.data);
