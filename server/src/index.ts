@@ -7,7 +7,14 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = env.PORT;
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://varahi-schools.vercel.app',
+        'http://localhost:5173',
+        'http://localhost:5174'
+    ],
+    credentials: true
+}));
 app.use(express.json());
 
 app.get('/', (req, res) => {
