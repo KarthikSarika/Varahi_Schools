@@ -1,0 +1,197 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+  teacher   Teacher?
+  student   Student?
+  parent    Parent?
+}
+
+model Teacher {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  userId         String          @unique @db.ObjectId
+  user           User            @relation(fields: [userId], references: [id])
+  subjects       Subject[]
+  timetable      Timetable[]
+  announcements  Announcement[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  isDeleted      Boolean         @default(false)
+}
+
+model Student {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  userId         String          @unique @db.ObjectId
+  user           User            @relation(fields: [userId], references: [id])
+  classId        String          @db.ObjectId
+  class          Class           @relation(fields: [classId], references: [id])
+  parentId       String?         @db.ObjectId
+  parent         Parent?         @relation(fields: [parentId], references: [id])
+  attendance     Attendance[]
+  marks          Mark[]
+  feePayments    FeePayment[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  isDeleted      Boolean         @default(false)
+
+  @@index([classId])
+  @@index([parentId])
+}
+
+model Parent {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  userId    String    @unique @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id])
+  students  Student[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+}
+
+model Class {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  section        String
+  students       Student[]
+  timetable      Timetable[]
+  attendance     Attendance[]
+  announcements  Announcement[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  isDeleted      Boolean         @default(false)
+}
+
+model Subject {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  teacherId String?     @db.ObjectId
+  teacher   Teacher?    @relation(fields: [teacherId], references: [id])
+  timetable Timetable[]
+  marks     Mark[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  isDeleted Boolean     @default(false)
+
+  @@index([teacherId])
+}
+
+model Timetable {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  day       String
+  startTime String
+  endTime   String
+  classId   String   @db.ObjectId
+  class     Class    @relation(fields: [classId], references: [id])
+  subjectId String   @db.ObjectId
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  teacherId String   @db.ObjectId
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  @@index([classId])
+  @@index([subjectId])
+  @@index([teacherId])
+}
+
+model Attendance {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  date      DateTime @default(now())
+  status    String   // PRESENT, ABSENT, LATE
+  studentId String   @db.ObjectId
+  student   Student  @relation(fields: [studentId], references: [id])
+  classId   String   @db.ObjectId
+  class     Class    @relation(fields: [classId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  @@index([studentId])
+  @@index([classId])
+  @@index([date])
+}
+
+model Mark {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  score     Float
+  type      String   // EXAM, ASSIGNMENT
+  studentId String   @db.ObjectId
+  student   Student  @relation(fields: [studentId], references: [id])
+  subjectId String   @db.ObjectId
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  @@index([studentId])
+  @@index([subjectId])
+}
+
+model Announcement {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String
+  role      Role?    // Target role (optional)
+  classId   String?  @db.ObjectId
+  class     Class?   @relation(fields: [classId], references: [id])
+  authorId  String?  @db.ObjectId
+  author    Teacher? @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  @@index([classId])
+  @@index([authorId])
+}
+
+model FeeStructure {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  amount      Float
+  description String?
+  payments    FeePayment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  isDeleted   Boolean      @default(false)
+}
+
+model FeePayment {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  status         String       // PAID, PENDING
+  date           DateTime?
+  studentId      String       @db.ObjectId
+  student        Student      @relation(fields: [studentId], references: [id])
+  feeStructureId String       @db.ObjectId
+  feeStructure   FeeStructure @relation(fields: [feeStructureId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  isDeleted      Boolean      @default(false)
+
+  @@index([studentId])
+  @@index([feeStructureId])
+}
